@@ -32,6 +32,7 @@ module.exports = class ShwarmaOrder extends Order {
     this.sFruits2 = "";
     this.sItem = "Conestoga Cafeteria";
     this.nOrder = 0;
+    this.sAddress = []
   }
   handleInput(sInput) {
     let aReturn = [];
@@ -287,12 +288,13 @@ module.exports = class ShwarmaOrder extends Order {
         aReturn.push(`${this.sUrl}/payment/${this.sNumber}/`);
         break;
       case OrderState.PAYMENT:
-        console.log("herere")
-        console.log(sInput);
+        //console.log("herere")
+        this.sAddress = Object.values(sInput.purchase_units[0].shipping.address);
+        console.log(this.sAddress)
         this.isDone(true);
         let d = new Date();
         d.setMinutes(d.getMinutes() + 20);
-        aReturn.push(`Your order will be delivered at ${d.toTimeString()}`);
+        aReturn.push(`Your order will be delivered at ${d.toTimeString()} to the address of ${(this.sAddress.join('\n'))}`);
         break;
     }
     return aReturn;
