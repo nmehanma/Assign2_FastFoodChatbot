@@ -31,6 +31,7 @@ module.exports = class ShwarmaOrder extends Order {
     this.sFruits = "";
     this.sFruits2 = "";
     this.sItem = "Conestoga Cafeteria";
+    this.nOrder = 0;
   }
   handleInput(sInput) {
     let aReturn = [];
@@ -46,15 +47,15 @@ module.exports = class ShwarmaOrder extends Order {
         this.stateCur = OrderState.TYPE;
         if (sInput.toLowerCase() == "small") {
           this.sSize = sInput;
-          this.total = this.total + 4;
+          this.nOrder = this.nOrder + 4;
           aReturn.push("What type would you like, Fish, Burger, or Chicken?");
         } else if (sInput.toLowerCase() == "medium") {
           this.sSize = sInput;
-          this.total = this.total + 5;
+          this.nOrder = this.nOrder + 5;
           aReturn.push("What type would you like, Fish, Burger, or Chicken?");
         } else if (sInput.toLowerCase() == "large") {
           this.sSize = sInput;
-          this.total = this.total + 6;
+          this.nOrder = this.nOrder + 6;
           aReturn.push("What type would you like, Fish, Burger, or Chicken?");
         } else {
           aReturn.push("Please enter valid size");
@@ -109,7 +110,7 @@ module.exports = class ShwarmaOrder extends Order {
           sInput.toLowerCase() == "water"
         ) {
           this.sDrinks = sInput;
-          this.total = this.total + 2;
+          this.nOrder = this.nOrder + 2;
           aReturn.push(
             "Would you like a fruit with that for an extra $3? If yes please specify apple or orange else enter no"
           );
@@ -130,7 +131,7 @@ module.exports = class ShwarmaOrder extends Order {
           sInput.toLowerCase() == "orange"
         ) {
           this.sFruits = sInput;
-          this.total = this.total + 3;
+          this.nOrder = this.nOrder + 3;
           aReturn.push(
             "Would you like a second item as well? If yes please specify either small medium or large else enter no"
           );
@@ -147,20 +148,20 @@ module.exports = class ShwarmaOrder extends Order {
         if (sInput.toLowerCase() == "small") {
           this.stateCur = OrderState.TYPE2;
           this.sSize2 = sInput;
-          this.total = this.total + 4;
+          this.nOrder = this.nOrder + 4;
           aReturn.push("What type would you like, Fish, Burger, or Chicken?");
         } else if (sInput.toLowerCase() == "medium") {
           this.stateCur = OrderState.TYPE2;
           this.sSize2 = sInput;
-          this.total = this.total + 5;
+          this.nOrder = this.nOrder + 5;
           aReturn.push("What type would you like, Fish, Burger, or Chicken?");
         } else if (sInput.toLowerCase() == "large") {
           this.stateCur = OrderState.TYPE2;
           this.sSize2 = sInput;
-          this.total = this.total + 6;
+          this.nOrder = this.nOrder + 6;
           aReturn.push("What type would you like, Fish, Burger, or Chicken?");
         } else if (sInput.toLowerCase() == "no") {
-          this.isDone(true);
+          this.stateCur = OrderState.PAYMENT;
           aReturn.push("Thank-you for your order of");
           aReturn.push(
             `${this.sSize} meal from ${this.sItem} of type ${this.sFlavour} ${this.sType}`
@@ -171,16 +172,14 @@ module.exports = class ShwarmaOrder extends Order {
           if (this.sFruits) {
             aReturn.push(`with a side of ${this.sFruits}`);
           }
-          aReturn.push(
-            `Total cost with tax is $${(this.total * 1.13).toFixed(2)}`
-          );
-          let d = new Date();
-          d.setMinutes(d.getMinutes() + 20);
-          aReturn.push(`Please pick it up at ${d.toTimeString()}`);
+          this.nOrder = (this.nOrder * 1.13).toFixed(2);
+          aReturn.push(`Total cost with tax is $${this.nOrder}`);
+          aReturn.push(`Please pay for your order here`);
+          aReturn.push(`${this.sUrl}/payment/${this.sNumber}/`);
           break;
         } else {
           aReturn.push("Please enter valid size");
-          this.stateCur = OrderState.SIZE2;
+         this.stateCur = OrderState.SIZE2;
         }
         break;
       case OrderState.TYPE2:
@@ -233,7 +232,7 @@ module.exports = class ShwarmaOrder extends Order {
           sInput.toLowerCase() == "water"
         ) {
           this.sDrinks2 = sInput;
-          this.total = this.total + 2;
+          this.nOrder = this.nOrder + 2;
           aReturn.push(
             "Would you like a fruit with that for an extra $3? If yes please specify apple or orange else enter no"
           );
@@ -252,7 +251,7 @@ module.exports = class ShwarmaOrder extends Order {
           sInput.toLowerCase() == "orange"
         ) {
           this.sFruits2 = sInput;
-          this.total = this.total + 3;
+          this.nOrder = this.nOrder + 3;
           this.stateCur = OrderState.PAYMENT;
         } else if (sInput.toLowerCase() != "no") {
           //this.stateCur = OrderState.FRUITS2;
@@ -282,39 +281,19 @@ module.exports = class ShwarmaOrder extends Order {
         if (this.sFruits2) {
           aReturn.push(`with a side of ${this.sFruits2}`);
         }
-
-        aReturn.push(
-          `Total cost with tax is $${(this.total * 1.13).toFixed(2)}`
-        );
+        this.nOrder = (this.nOrder * 1.13).toFixed(2);
+        aReturn.push(`Total cost with tax is $${this.nOrder}`);
         aReturn.push(`Please pay for your order here`);
         aReturn.push(`${this.sUrl}/payment/${this.sNumber}/`);
-
-        // let d = new Date();
-        // d.setMinutes(d.getMinutes() + 20);
-        // aReturn.push(`Please pick it up at ${d.toTimeString()}`);
         break;
       case OrderState.PAYMENT:
+        console.log("herere")
         console.log(sInput);
         this.isDone(true);
         let d = new Date();
         d.setMinutes(d.getMinutes() + 20);
         aReturn.push(`Your order will be delivered at ${d.toTimeString()}`);
         break;
-
-      // case OrderState.DRINKS:
-      //   this.stateCur = OrderState.PAYMENT;
-      //   this.nOrder = 15;
-      //   if (sInput.toLowerCase() != "no") {
-      //     this.sDrinks = sInput;
-      //   }
-      //   aReturn.push("Thank-you for your order of");
-      //   aReturn.push(`${this.sSize} ${this.sItem} with ${this.sToppings}`);
-      //   if (this.sDrinks) {
-      //     aReturn.push(this.sDrinks);
-      //   }
-      //   aReturn.push(`Please pay for your order here`);
-      //   aReturn.push(`${this.sUrl}/payment/${this.sNumber}/`);
-      //   break;
     }
     return aReturn;
   }
