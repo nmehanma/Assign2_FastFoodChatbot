@@ -32,7 +32,8 @@ module.exports = class ShwarmaOrder extends Order {
     this.sFruits2 = "";
     this.sItem = "Conestoga Cafeteria";
     this.nOrder = 0;
-    this.sAddress = []
+    this.sAddress = [];
+    this.sName = "";
   }
   handleInput(sInput) {
     let aReturn = [];
@@ -180,7 +181,7 @@ module.exports = class ShwarmaOrder extends Order {
           break;
         } else {
           aReturn.push("Please enter valid size");
-         this.stateCur = OrderState.SIZE2;
+          this.stateCur = OrderState.SIZE2;
         }
         break;
       case OrderState.TYPE2:
@@ -288,13 +289,22 @@ module.exports = class ShwarmaOrder extends Order {
         aReturn.push(`${this.sUrl}/payment/${this.sNumber}/`);
         break;
       case OrderState.PAYMENT:
-        //console.log("herere")
-        this.sAddress = Object.values(sInput.purchase_units[0].shipping.address);
-        console.log(this.sAddress)
+        console.log(sInput.purchase_units[0]);
+        this.sName = sInput.purchase_units[0].shipping.name.full_name;
+        this.sAddress = Object.values(
+          sInput.purchase_units[0].shipping.address
+        );
+        console.log(this.sAddress);
+        console.log(this.sName);
         this.isDone(true);
         let d = new Date();
         d.setMinutes(d.getMinutes() + 20);
-        aReturn.push(`Your order will be delivered at ${d.toTimeString()} to the address of ${(this.sAddress.join('\n'))}`);
+        aReturn.push(
+          `Your order will be delivered at ${d.toTimeString()} to the shipping  name and address of ${
+            this.sName
+          } ${this.sAddress.join("\n")}`
+        );
+        // console.log(this.sAddress.join("\n"))
         break;
     }
     return aReturn;
