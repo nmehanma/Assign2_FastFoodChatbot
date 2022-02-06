@@ -125,7 +125,6 @@ module.exports = class ShwarmaOrder extends Order {
           aReturn.push("Please make a valid entry");
         }
         break;
-
       case OrderState.FRUITS:
         this.stateCur = OrderState.SIZE2;
         if (
@@ -300,7 +299,9 @@ module.exports = class ShwarmaOrder extends Order {
         let d = new Date();
         d.setMinutes(d.getMinutes() + 20);
         aReturn.push(
-          `Thank you ${this.sName} for your payment! Your order will be delivered at ${d.toTimeString()} to the shipping  name and address of ${
+          `Thank you ${
+            this.sName
+          } for your payment! Your order will be delivered at ${d.toTimeString()} to the shipping  name and address of ${
             this.sName
           } ${this.sAddress.join("\n")}`
         );
